@@ -29,3 +29,16 @@ class ContentUploadView(generics.CreateAPIView):
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ContentDetailView(generics.RetrieveUpdateAPIView):
+    queryset = Content.objects.all()
+    serializer_class = ContentSerializer
+
+    def patch(self, request, *args, **kwargs):
+        content = self.get_object()
+
+        serializer = self.get_serializer(content, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
