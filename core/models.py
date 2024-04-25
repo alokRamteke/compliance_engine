@@ -1,8 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from uuid import uuid4
-import os
+from django.db import models
+
+from core.utils import unique_file_name
 
 
 class Guideline(models.Model):
@@ -16,12 +16,6 @@ class Guideline(models.Model):
     class Meta:
         verbose_name = 'Compliance Guideline'
         verbose_name_plural = 'Compliance Guidelines'
-
-
-def unique_file_name(instance, filename):
-    ext = filename.split('.')[-1]
-    filename = f"{uuid4().hex}.{ext}"
-    return os.path.join('uploads/', filename)
 
 
 class Content(models.Model):
@@ -38,7 +32,9 @@ class Content(models.Model):
     @property
     def review_status(self):
         try:
-            passed_reviews = self.review_items.filter(status=ReviewItem.StatusChoices.PASSED).count()
+            passed_reviews = self.review_items.filter(
+                status=ReviewItem.StatusChoices.PASSED
+            ).count()
             if passed_reviews == self.review_items.count():
                 return "Completed"
             else:
@@ -53,10 +49,20 @@ class ReviewItem(models.Model):
         PASSED = 'PASS', 'Passed'
         FAILED = 'FAIL', 'Failed'
 
-    content = models.ForeignKey(Content, on_delete=models.CASCADE, related_name='review_items')
+    content = models.ForeignKey(
+        Content, on_delete=models.CASCADE, related_name='review_items'
+    )
     guideline = models.ForeignKey(Guideline, on_delete=models.CASCADE)
-    reviewer = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='review_items')
-    status = models.CharField(max_length=10, choices=StatusChoices.choices, default=StatusChoices.PENDING)
+    reviewer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='review_items',
+    )
+    status = models.CharField(
+        max_length=10, choices=StatusChoices.choices, default=StatusChoices.PENDING
+    )
     reviewed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
