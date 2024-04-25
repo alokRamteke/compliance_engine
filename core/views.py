@@ -5,6 +5,7 @@ from rest_framework import status
 from core.models import Guideline, Content, ReviewItem
 from core.serializers import GuidelineSerializer, ContentSerializer, ReviewItemSerializer
 from rest_framework.parsers import MultiPartParser, FileUploadParser
+from django.db import transaction
 
 
 class GuidelineViewSet(viewsets.ModelViewSet):
@@ -65,3 +66,31 @@ class ContentReviewStatusView(APIView):
         review_items = ReviewItemSerializer(reviews, many=True).data
 
         return Response(review_items)
+
+
+class ContentReviewUpdateAPIView(generics.UpdateAPIView):
+    serializer_class = ReviewItemSerializer
+    queryset = ReviewItem.objects.all()
+
+    @transaction.atomic
+    def put(self, request, *args, **kwargs):
+        content_id = self.kwargs.get('content_id')
+        review_item_id = self.kwargs.get('review_item_id')
+
+        try:
+            content = Content.objects.get(id=content_id)
+        except Content.DoesNotExist:
+            return Response({'error': 'No Content matches the given query.'}, status=status.HTTP_404_NOT_FOUND)
+
+        review_item = content.review_items.filter(pk=review_item_id).first()
+        if not review_item:
+            return Response({'error': 'No Review item matches the given query.'}, status=status.HTTP_404_NOT_FOUND)
+    
+        serializer = self.get_serializer(review_item, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        review_item.reviewer = request.user
+        review_item.save()
+
+        return Response(serializer.data)

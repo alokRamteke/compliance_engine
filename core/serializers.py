@@ -34,6 +34,12 @@ class ContentSerializer(serializers.ModelSerializer):
 
 class ReviewItemSerializer(serializers.ModelSerializer):
     guideline = GuidelineSerializer(read_only=True)
+    status_choices = [
+        ('PENDING', 'Pending'),
+        ('PASS', 'Passed'),
+        ('FAIL', 'Failed'),
+    ]
+    status = serializers.ChoiceField(choices=status_choices)
     reviewer = serializers.SerializerMethodField()
 
     class Meta:
