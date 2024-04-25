@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import viewsets, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -68,7 +69,7 @@ class ContentReviewStatusView(APIView):
         return Response(review_items)
 
 
-class ContentReviewUpdateAPIView(generics.UpdateAPIView):
+class ContentReviewUpdateView(generics.UpdateAPIView):
     serializer_class = ReviewItemSerializer
     queryset = ReviewItem.objects.all()
 
@@ -91,6 +92,7 @@ class ContentReviewUpdateAPIView(generics.UpdateAPIView):
         self.perform_update(serializer)
 
         review_item.reviewer = request.user
+        review_item.reviewed_at = timezone.now()
         review_item.save()
 
         return Response(serializer.data)

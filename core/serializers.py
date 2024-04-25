@@ -17,7 +17,7 @@ class ContentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Content
-        read_only_fields = ('id', 'version', 'author', 'review_status')
+        read_only_fields = ('id', 'version', 'author', 'created_at', 'updated_at', 'review_status')
         fields = (*read_only_fields, 'title', 'file')
     
     def validate_file(self, file):
@@ -44,9 +44,12 @@ class ReviewItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReviewItem
-        fields = ('id', 'guideline', 'status', 'reviewer')
+        fields = ('id', 'guideline', 'status', 'reviewer', 'reviewed_at')
 
     def get_reviewer(self, obj):
+        """
+        Return the full name of the reviewer.
+        """
         if obj.reviewer:
             return obj.reviewer.get_full_name()
         else:
