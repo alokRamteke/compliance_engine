@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class Guideline(models.Model):
@@ -23,6 +24,17 @@ class Content(models.Model):
 
     def __str__(self):
         return f"{self.title} (v-{self.version})"
+
+    @property
+    def review_status(self):
+        try:
+            passed_reviews = self.review_items.filter(status=ReviewItem.StatusChoices.PASSED).count()
+            if passed_reviews == self.review_items.count():
+                return "Completed"
+            else:
+                return "Pending"
+        except ObjectDoesNotExist:
+            return "No review items"
 
 
 class ReviewItem(models.Model):

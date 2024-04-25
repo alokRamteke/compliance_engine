@@ -13,10 +13,11 @@ class GuidelineSerializer(serializers.ModelSerializer):
 
 
 class ContentSerializer(serializers.ModelSerializer):
+    review_status = serializers.SerializerMethodField()
 
     class Meta:
         model = Content
-        read_only_fields = ('id', 'version', 'author')
+        read_only_fields = ('id', 'version', 'author', 'review_status')
         fields = (*read_only_fields, 'title', 'file')
     
     def validate_file(self, file):
@@ -26,6 +27,9 @@ class ContentSerializer(serializers.ModelSerializer):
         if extension not in ALLOWED_EXTENSIONS:
             raise ValidationError('Invalid file type. Only images, Word documents, TXT, and PDF files are allowed.')
         return file
+
+    def get_review_status(self, obj):
+        return obj.review_status
 
 
 class ReviewItemSerializer(serializers.ModelSerializer):
