@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from core.models import Guideline
 from core.serializers import GuidelineSerializer, ContentSerializer
+from rest_framework.parsers import MultiPartParser, FileUploadParser
 
 
 class GuidelineViewSet(viewsets.ModelViewSet):
@@ -13,6 +14,7 @@ class GuidelineViewSet(viewsets.ModelViewSet):
 
 class ContentUploadView(generics.CreateAPIView):
     serializer_class = ContentSerializer
+    parser_classes = [MultiPartParser, FileUploadParser]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
