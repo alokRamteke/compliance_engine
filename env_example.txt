@@ -1,0 +1,6 @@
+SECRET_KEY="your_secret_key_here"
+DB_NAME="test-db"
+DB_USER="test-user"
+DB_PASSWORD="test-password"
+DB_HOST="localhost"
+DB_PORT=5432
