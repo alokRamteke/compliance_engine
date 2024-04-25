@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from uuid import uuid4
+import os
 
 
 class Guideline(models.Model):
@@ -16,9 +18,15 @@ class Guideline(models.Model):
         verbose_name_plural = 'Compliance Guidelines'
 
 
+def unique_file_name(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f"{uuid4().hex}.{ext}"
+    return os.path.join('uploads/', filename)
+
+
 class Content(models.Model):
     title = models.CharField(max_length=255)
-    file = models.FileField(upload_to='uploads/')
+    file = models.FileField(upload_to=unique_file_name)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='content')
     version = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
