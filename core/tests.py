@@ -11,7 +11,15 @@ from core.serializers import GuidelineSerializer, ReviewItemSerializer
 
 
 class GuidelineViewSetTestCase(TestCase):
+    """
+    Test cases for GuidelineViewSet API endpoints.
+    """
     def setUp(self):
+        """
+        Set up function for the test case.
+        This function creates a test user and authenticates the client.
+        It also creates two guidelines.
+        """
         self.user = User.objects.create_user(
             username='testuser', password='testpassword'
         )
@@ -33,6 +41,9 @@ class GuidelineViewSetTestCase(TestCase):
         )
 
     def test_list_guidelines(self):
+        """
+        Test case for listing guidelines.
+        """
         response = self.client.get(reverse('guideline-list'))
         guidelines = Guideline.objects.all()
         serializer = GuidelineSerializer(guidelines, many=True)
@@ -40,6 +51,9 @@ class GuidelineViewSetTestCase(TestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_retrieve_guideline(self):
+        """
+        Test case for retrieving a guideline.
+        """
         response = self.client.get(
             reverse('guideline-detail', args=[self.guideline1.id])
         )
@@ -49,12 +63,18 @@ class GuidelineViewSetTestCase(TestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_create_guideline(self):
+        """
+        Test case for creating a guideline.
+        """
         data = {'title': 'New Guideline', 'description': 'New Description'}
         response = self.client.post(reverse('guideline-list'), data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Guideline.objects.filter(title='New Guideline').exists())
 
     def test_update_guideline(self):
+        """
+        Test case for updating a guideline.
+        """
         data = {'title': 'Updated Guideline', 'description': 'Updated Description'}
         response = self.client.put(
             reverse('guideline-detail', args=[self.guideline1.id]), data
@@ -65,6 +85,9 @@ class GuidelineViewSetTestCase(TestCase):
         self.assertEqual(self.guideline1.description, 'Updated Description')
 
     def test_partial_update_guideline(self):
+        """
+        Test case for partially updating a guideline.
+        """
         data = {'description': 'Updated Description'}
         response = self.client.patch(
             reverse('guideline-detail', args=[self.guideline1.id]), data
@@ -74,6 +97,9 @@ class GuidelineViewSetTestCase(TestCase):
         self.assertEqual(self.guideline1.description, 'Updated Description')
 
     def test_delete_guideline_not_allowed(self):
+        """
+        Test case for checking that DELETE method is not allowed.
+        """
         response = self.client.delete(
             reverse('guideline-detail', args=[self.guideline1.id])
         )
@@ -81,7 +107,13 @@ class GuidelineViewSetTestCase(TestCase):
 
 
 class ContentListViewTestCase(TestCase):
+    """
+    Test case for ContentListView API endpoint.
+    """
     def setUp(self):
+        """
+        Set up test environment.
+        """
         self.client = APIClient()
         self.user = User.objects.create_user(
             username='testuser', password='testpassword'
@@ -96,6 +128,9 @@ class ContentListViewTestCase(TestCase):
         )
 
     def test_get_content_list(self):
+        """
+        Test case for GET request to ContentListView API endpoint.
+        """
         url = reverse('content-list')
         response = self.client.get(url)
 
@@ -103,6 +138,9 @@ class ContentListViewTestCase(TestCase):
         self.assertEqual(len(response.data), 2)
 
     def test_get_content_list_unauthenticated(self):
+        """
+        Test case for GET request to ContentListView API endpoint when not authenticated.
+        """
         self.client.logout()
 
         url = reverse('content-list')
@@ -112,7 +150,13 @@ class ContentListViewTestCase(TestCase):
 
 
 class ContentUploadViewTestCase(TestCase):
+    """
+    Test case for ContentUploadView API endpoint.
+    """
     def setUp(self):
+        """
+        Set up test environment.
+        """
         self.client = APIClient()
         self.user = User.objects.create_user(
             username='testuser', password='testpassword'
@@ -127,6 +171,9 @@ class ContentUploadViewTestCase(TestCase):
         )
 
     def test_upload_content_success(self):
+        """
+        Test case for successful content upload.
+        """
         url = reverse('content-upload')
 
         with tempfile.NamedTemporaryFile(suffix=".txt", delete=False) as temp_file:
@@ -146,6 +193,9 @@ class ContentUploadViewTestCase(TestCase):
         )
 
     def test_upload_content_with_same_title(self):
+        """
+        Test case for uploading content with the same title.
+        """
         Content.objects.create(
             title='Test Content', file='testfile.txt', author=self.user
         )
@@ -166,6 +216,9 @@ class ContentUploadViewTestCase(TestCase):
         )
 
     def test_upload_content_invalid_data(self):
+        """
+        Test case for uploading content with invalid data.
+        """
         url = reverse('content-upload')
 
         with tempfile.NamedTemporaryFile(suffix=".txt", delete=False) as temp_file:
@@ -178,6 +231,9 @@ class ContentUploadViewTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_upload_content_with_non_allowed_extension(self):
+        """
+        Test case for uploading content with non-allowed extension.
+        """
         url = reverse('content-upload')
 
         with tempfile.NamedTemporaryFile(suffix=".exe", delete=False) as temp_file:
@@ -197,7 +253,13 @@ class ContentUploadViewTestCase(TestCase):
 
 
 class ContentDetailViewTestCase(TestCase):
+    """
+    Test case for ContentDetailView.
+    """
     def setUp(self):
+        """
+        Set up test case.
+        """
         self.client = APIClient()
         self.user = User.objects.create_user(
             username='testuser', password='testpassword'
@@ -212,12 +274,18 @@ class ContentDetailViewTestCase(TestCase):
         )
 
     def test_get_content_detail(self):
+        """
+        Test case for retrieving content detail.
+        """
         url = reverse('content-detail', kwargs={'pk': self.content1.pk})
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_patch_content_detail(self):
+        """
+        Test case for updating content detail.
+        """
         url = reverse('content-detail', kwargs={'pk': self.content1.pk})
         data = {'title': 'Updated Content 1'}
 
@@ -229,6 +297,9 @@ class ContentDetailViewTestCase(TestCase):
         self.assertEqual(self.content1.title, 'Updated Content 1')
 
     def test_patch_content_detail_unauthorized(self):
+        """
+        Test case for updating content detail with unauthorized user.
+        """
         other_user = User.objects.create_user(
             username='otheruser', password='testpassword'
         )
@@ -244,7 +315,13 @@ class ContentDetailViewTestCase(TestCase):
 
 
 class ContentReviewStatusViewTestCase(TestCase):
+    """
+    Test case for ContentReviewStatusView.
+    """
     def setUp(self):
+        """
+        Set up test case.
+        """
         self.client = APIClient()
         self.user = User.objects.create_user(
             username='testuser', password='testpassword'
@@ -272,6 +349,9 @@ class ContentReviewStatusViewTestCase(TestCase):
         )
 
     def test_get_review_status(self):
+        """
+        Test case for retrieving review status.
+        """
         url = reverse('content-review-status', kwargs={'content_id': self.content.pk})
         response = self.client.get(url)
 
@@ -283,6 +363,9 @@ class ContentReviewStatusViewTestCase(TestCase):
         self.assertEqual(response.data, expected_data)
 
     def test_get_review_status_nonexistent_content(self):
+        """
+        Test case for retrieving review status for a nonexistent content.
+        """
         url = reverse('content-review-status', kwargs={'content_id': 999})
         response = self.client.get(url)
 
@@ -290,7 +373,13 @@ class ContentReviewStatusViewTestCase(TestCase):
 
 
 class ContentReviewUpdateAPIViewTestCase(TestCase):
+    """
+    Test case for the ContentReviewUpdateAPIView.
+    """
     def setUp(self):
+        """
+        Set up test data.
+        """
         self.client = APIClient()
         self.user = User.objects.create_user(
             username='testuser', password='testpassword'
@@ -318,6 +407,9 @@ class ContentReviewUpdateAPIViewTestCase(TestCase):
         )
 
     def test_update_review_item_success(self):
+        """
+        Test case for successful review item update.
+        """
         url = reverse(
             'content-review-update',
             kwargs={
@@ -337,6 +429,9 @@ class ContentReviewUpdateAPIViewTestCase(TestCase):
         self.assertIsNotNone(self.review_item1.reviewed_at)
 
     def test_update_review_item_nonexistent_content(self):
+        """
+        Test case for updating review item for a nonexistent content.
+        """
         url = reverse(
             'content-review-update',
             kwargs={'content_id': 999, 'review_item_id': self.review_item1.pk},
@@ -349,6 +444,9 @@ class ContentReviewUpdateAPIViewTestCase(TestCase):
         self.assertEqual(response.data['error'], 'No Content matches the given query.')
 
     def test_update_review_item_nonexistent_review_item(self):
+        """
+        Test case for updating nonexistent review item.
+        """
         url = reverse(
             'content-review-update',
             kwargs={'content_id': self.content.pk, 'review_item_id': 999},
@@ -363,6 +461,9 @@ class ContentReviewUpdateAPIViewTestCase(TestCase):
         )
 
     def test_update_review_item_invalid_data(self):
+        """
+        Test case for updating review item with invalid data.
+        """
         url = reverse(
             'content-review-update',
             kwargs={

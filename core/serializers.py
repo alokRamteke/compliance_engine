@@ -9,12 +9,18 @@ ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".docx", ".txt", ".pdf"]
 
 
 class GuidelineSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Guideline model.
+    """
     class Meta:
         model = Guideline
         fields = '__all__'
 
 
 class ContentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Content model.
+    """
     review_status = serializers.SerializerMethodField()
 
     class Meta:
@@ -30,6 +36,9 @@ class ContentSerializer(serializers.ModelSerializer):
         fields = (*read_only_fields, 'title', 'file')
 
     def validate_file(self, file):
+        """
+        Validates the file extension of the uploaded file.
+        """
         _, extension = splitext(file.name)
         extension = extension.lower()
 
@@ -40,10 +49,16 @@ class ContentSerializer(serializers.ModelSerializer):
         return file
 
     def get_review_status(self, obj):
+        """
+        Retrieves the review status of the Content object.
+        """
         return obj.review_status
 
 
 class ReviewItemSerializer(serializers.ModelSerializer):
+    """
+    Serializer for ReviewItem model.
+    """
     guideline = GuidelineSerializer(read_only=True)
     status_choices = [
         ('PENDING', 'Pending'),
@@ -59,7 +74,7 @@ class ReviewItemSerializer(serializers.ModelSerializer):
 
     def get_reviewer(self, obj):
         """
-        Return the full name of the reviewer.
+        Return the full name of the reviewer, or None if reviewer is None.
         """
         if obj.reviewer:
             return obj.reviewer.get_full_name()
