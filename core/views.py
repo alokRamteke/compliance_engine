@@ -1,7 +1,7 @@
 from rest_framework import viewsets, generics
 from rest_framework.response import Response
 from rest_framework import status
-from core.models import Guideline
+from core.models import Guideline, Content
 from core.serializers import GuidelineSerializer, ContentSerializer
 from rest_framework.parsers import MultiPartParser, FileUploadParser
 
@@ -21,6 +21,9 @@ class ContentUploadView(generics.CreateAPIView):
         user = request.user
 
         if serializer.is_valid():
+            existing_content = Content.objects.filter(author=user, title=request.data['title'])
+            if existing_content.exists():
+                return Response({'error': 'Content with the same title already exists. Please choose a unique title or update existing content.'}, status=status.HTTP_409_CONFLICT)
             serializer.validated_data['author'] = user 
             self.perform_create(serializer)
 
