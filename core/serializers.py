@@ -3,9 +3,8 @@ from os.path import splitext
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
+from core.constants import ALLOWED_EXTENSIONS
 from core.models import Content, Guideline, ReviewItem
-
-ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".docx", ".txt", ".pdf"]
 
 
 class GuidelineSerializer(serializers.ModelSerializer):

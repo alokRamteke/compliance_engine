@@ -1,9 +1,8 @@
-import os
-from uuid import uuid4
-
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+
+from core.utils import unique_file_name
 
 
 class Guideline(models.Model):
@@ -17,20 +16,6 @@ class Guideline(models.Model):
     class Meta:
         verbose_name = 'Compliance Guideline'
         verbose_name_plural = 'Compliance Guidelines'
-
-
-def unique_file_name(instance, filename):
-    """
-    Generates a unique filename for the given instance and filename.
-    Args:
-        instance: The instance of the model.
-        filename: The original filename.
-    Returns:
-        A string representing the unique filename.
-    """
-    ext = filename.split('.')[-1]
-    filename = f"{uuid4().hex}.{ext}"
-    return os.path.join('uploads/', filename)
 
 
 class Content(models.Model):
