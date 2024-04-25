@@ -80,9 +80,12 @@ class ContentDetailView(generics.RetrieveUpdateAPIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
+        updated_content = request.data.get('file')
         serializer = self.get_serializer(content, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.validated_data['version'] = content.version + 1
+
+        if updated_content is not None:
+            serializer.validated_data['version'] = content.version + 1
 
         self.perform_update(serializer)
 
