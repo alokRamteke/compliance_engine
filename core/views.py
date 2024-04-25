@@ -40,5 +40,6 @@ class ContentDetailView(generics.RetrieveUpdateAPIView):
 
         serializer = self.get_serializer(content, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
+        serializer.validated_data['version'] = content.version + 1
         self.perform_update(serializer)
         return Response(serializer.data)
