@@ -37,6 +37,8 @@ class ContentDetailView(generics.RetrieveUpdateAPIView):
 
     def patch(self, request, *args, **kwargs):
         content = self.get_object()
+        if content.author != request.user:
+            return Response({'error': 'You can only update content you own.'}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = self.get_serializer(content, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
