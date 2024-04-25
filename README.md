@@ -1,6 +1,58 @@
 ## This is a very small, ultra-simplified, non-AI version of compliance engine
 
-API endpoints are organized in the following groups:
+
+## Installation
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/alokRamteke/compliance_engine.git
+   ```
+
+2. Navigate to the project directory:
+    ```
+    cd compliance_engine/
+    ```
+
+3. Create a virtual environment:
+   ```
+   virtualenv -p python3.12 venv
+   ```
+4. Activate the virtual environment:
+   ```
+   source venv/bin/activate
+   ```
+
+5. Install the dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+6. Create a .env file in the project root directory:
+    ```
+    touch .env
+    ````
+
+7. Add the following environment variables to the .env file:
+    ```
+    SECRET_KEY=your_secret_key_here
+    DB_NAME=your_database_name
+    DB_USER=your_database_user
+    DB_PASSWORD=your_database_password
+    DB_HOST=your_database_host
+    DB_PORT=your_database_port
+    ```
+
+8. Apply database migrations:
+    ```
+    python manage.py migrate
+    ```
+
+9. Start the development server:
+    ```
+    python manage.py runserver
+    ```
+
+## API endpoints are organized in the following groups:
 
 ### Guideline endpoints
 
