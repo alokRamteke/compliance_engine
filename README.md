@@ -80,3 +80,10 @@ Request responses:
 
 - Successful requests return a JSON object with the updated data.
 - Error requests return a JSON object with an `error` key indicating the error message.
+
+## API Documentation
+
+The API documentation is generated using both Swagger and ReDoc.
+
+- Swagger UI: You can access the Swagger UI by navigating to /swagger/ in your browser.
+- ReDoc: Alternatively, you can access the ReDoc documentation by navigating to /redoc/ in your browser.
