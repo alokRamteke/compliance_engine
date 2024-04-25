@@ -16,7 +16,8 @@ class ContentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Content
-        fields = ('title', 'file')
+        read_only_fields = ('id', 'version', 'author')
+        fields = (*read_only_fields, 'title', 'file')
     
     def validate_file(self, file):
         _, extension = splitext(file.name)

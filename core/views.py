@@ -12,6 +12,11 @@ class GuidelineViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'patch', 'post', 'put')
 
 
+class ContentListView(generics.ListAPIView):
+    queryset = Content.objects.all()
+    serializer_class = ContentSerializer
+
+
 class ContentUploadView(generics.CreateAPIView):
     serializer_class = ContentSerializer
     parser_classes = [MultiPartParser, FileUploadParser]
