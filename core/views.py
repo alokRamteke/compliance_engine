@@ -1,8 +1,9 @@
 from rest_framework import viewsets, generics
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from core.models import Guideline, Content
-from core.serializers import GuidelineSerializer, ContentSerializer
+from core.models import Guideline, Content, ReviewItem
+from core.serializers import GuidelineSerializer, ContentSerializer, ReviewItemSerializer
 from rest_framework.parsers import MultiPartParser, FileUploadParser
 
 
@@ -50,3 +51,17 @@ class ContentDetailView(generics.RetrieveUpdateAPIView):
         serializer.validated_data['version'] = content.version + 1
         self.perform_update(serializer)
         return Response(serializer.data)
+
+
+class ContentReviewStatusView(APIView):
+
+    def get(self, request, content_id):
+        try:
+            content = Content.objects.get(pk=content_id)
+        except Content.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        reviews = ReviewItem.objects.filter(content=content)
+        review_items = ReviewItemSerializer(reviews, many=True).data
+
+        return Response(review_items)
