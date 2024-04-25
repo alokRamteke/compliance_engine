@@ -1,7 +1,9 @@
-from rest_framework import serializers
-from core.models import Guideline, Content, ReviewItem
-from django.core.exceptions import ValidationError
 from os.path import splitext
+
+from django.core.exceptions import ValidationError
+from rest_framework import serializers
+
+from core.models import Content, Guideline, ReviewItem
 
 ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".docx", ".txt", ".pdf"]
 
@@ -17,15 +19,24 @@ class ContentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Content
-        read_only_fields = ('id', 'version', 'author', 'created_at', 'updated_at', 'review_status')
+        read_only_fields = (
+            'id',
+            'version',
+            'author',
+            'created_at',
+            'updated_at',
+            'review_status',
+        )
         fields = (*read_only_fields, 'title', 'file')
-    
+
     def validate_file(self, file):
         _, extension = splitext(file.name)
         extension = extension.lower()
 
         if extension not in ALLOWED_EXTENSIONS:
-            raise ValidationError('Invalid file type. Only images, Word documents, TXT, and PDF files are allowed.')
+            raise ValidationError(
+                'Invalid file type. Only images, Word documents, TXT, and PDF files are allowed.'
+            )
         return file
 
     def get_review_status(self, obj):

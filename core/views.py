@@ -1,12 +1,13 @@
-from django.utils import timezone
-from rest_framework import viewsets, generics
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from core.models import Guideline, Content, ReviewItem
-from core.serializers import GuidelineSerializer, ContentSerializer, ReviewItemSerializer
-from rest_framework.parsers import MultiPartParser, FileUploadParser
 from django.db import transaction
+from django.utils import timezone
+from rest_framework import generics, status, viewsets
+from rest_framework.parsers import FileUploadParser, MultiPartParser
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from core.models import Content, Guideline, ReviewItem
+from core.serializers import (ContentSerializer, GuidelineSerializer,
+                              ReviewItemSerializer)
 
 
 class GuidelineViewSet(viewsets.ModelViewSet):
@@ -29,10 +30,17 @@ class ContentUploadView(generics.CreateAPIView):
         user = request.user
 
         if serializer.is_valid():
-            existing_content = Content.objects.filter(author=user, title=request.data['title'])
+            existing_content = Content.objects.filter(
+                author=user, title=request.data['title']
+            )
             if existing_content.exists():
-                return Response({'error': 'Content with the same title already exists. Please choose a unique title or update existing content.'}, status=status.HTTP_409_CONFLICT)
-            serializer.validated_data['author'] = user 
+                return Response(
+                    {
+                        'error': 'Content with the same title already exists. Please choose a unique title or update existing content.'
+                    },
+                    status=status.HTTP_409_CONFLICT,
+                )
+            serializer.validated_data['author'] = user
             self.perform_create(serializer)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -46,7 +54,10 @@ class ContentDetailView(generics.RetrieveUpdateAPIView):
     def patch(self, request, *args, **kwargs):
         content = self.get_object()
         if content.author != request.user:
-            return Response({'error': 'You can only update content you own.'}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {'error': 'You can only update content you own.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         serializer = self.get_serializer(content, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -81,12 +92,18 @@ class ContentReviewUpdateView(generics.UpdateAPIView):
         try:
             content = Content.objects.get(id=content_id)
         except Content.DoesNotExist:
-            return Response({'error': 'No Content matches the given query.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {'error': 'No Content matches the given query.'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         review_item = content.review_items.filter(pk=review_item_id).first()
         if not review_item:
-            return Response({'error': 'No Review item matches the given query.'}, status=status.HTTP_404_NOT_FOUND)
-    
+            return Response(
+                {'error': 'No Review item matches the given query.'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
         serializer = self.get_serializer(review_item, data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)

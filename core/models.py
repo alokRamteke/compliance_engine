@@ -1,8 +1,9 @@
-from django.db import models
+import os
+from uuid import uuid4
+
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from uuid import uuid4
-import os
+from django.db import models
 
 
 class Guideline(models.Model):
@@ -38,7 +39,9 @@ class Content(models.Model):
     @property
     def review_status(self):
         try:
-            passed_reviews = self.review_items.filter(status=ReviewItem.StatusChoices.PASSED).count()
+            passed_reviews = self.review_items.filter(
+                status=ReviewItem.StatusChoices.PASSED
+            ).count()
             if passed_reviews == self.review_items.count():
                 return "Completed"
             else:
@@ -53,10 +56,20 @@ class ReviewItem(models.Model):
         PASSED = 'PASS', 'Passed'
         FAILED = 'FAIL', 'Failed'
 
-    content = models.ForeignKey(Content, on_delete=models.CASCADE, related_name='review_items')
+    content = models.ForeignKey(
+        Content, on_delete=models.CASCADE, related_name='review_items'
+    )
     guideline = models.ForeignKey(Guideline, on_delete=models.CASCADE)
-    reviewer = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='review_items')
-    status = models.CharField(max_length=10, choices=StatusChoices.choices, default=StatusChoices.PENDING)
+    reviewer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='review_items',
+    )
+    status = models.CharField(
+        max_length=10, choices=StatusChoices.choices, default=StatusChoices.PENDING
+    )
     reviewed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):

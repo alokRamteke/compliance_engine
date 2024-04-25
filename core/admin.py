@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from core.models import Content, Guideline, ReviewItem
 
 
@@ -19,7 +20,7 @@ class ContentAdmin(admin.ModelAdmin):
 
 @admin.register(ReviewItem)
 class ReviewItemAdmin(admin.ModelAdmin):
-    list_display=('id', 'content', 'guideline', 'status', 'reviewer', 'reviewed_at')
-    list_filter=('guideline', 'status', 'reviewer')
-    search_fields=('guideline__title', 'guideline__description', 'content__title')
+    list_display = ('id', 'content', 'guideline', 'status', 'reviewer', 'reviewed_at')
+    list_filter = ('guideline', 'status', 'reviewer')
+    search_fields = ('guideline__title', 'guideline__description', 'content__title')
     readonly_fields = ('reviewed_at',)
